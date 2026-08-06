@@ -316,6 +316,86 @@
       border: none;
     }
 
+    /* ========== Summary Card (最上方總覽) ========== */
+    .summary-card {
+      background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      border-radius: 20px;
+      padding: 24px 20px 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 30px rgba(15, 23, 42, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-card::before {
+      content: "";
+      position: absolute;
+      top: -30%;
+      right: -15%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(201, 162, 39, 0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .summary-label {
+      font-size: 0.82rem;
+      opacity: 0.7;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .summary-value {
+      font-size: 2.1rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .summary-profit {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .summary-profit.positive {
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.15);
+    }
+
+    .summary-profit.negative {
+      color: #f87171;
+      background: rgba(248, 113, 113, 0.15);
+    }
+
+    .summary-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 16px;
+    }
+
+    .summary-stat {
+      text-align: center;
+    }
+
+    .summary-stat .s-label {
+      font-size: 0.72rem;
+      opacity: 0.65;
+      margin-bottom: 4px;
+    }
+
+    .summary-stat .s-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
     /* ========== Stats ========== */
     .stats-grid {
       display: grid;
@@ -683,6 +763,28 @@
   <div class="container">
     <!-- ========== 個人紀錄 ========== -->
     <div id="record" class="section active">
+
+      <!-- 最上方總覽卡片 -->
+      <div class="summary-card" id="summaryCard">
+        <div class="summary-label">0050 總資產估值</div>
+        <div class="summary-value" id="summaryMarketValue">$0</div>
+        <div class="summary-profit" id="summaryProfit">—</div>
+        <div class="summary-stats">
+          <div class="summary-stat">
+            <div class="s-label">投入本金</div>
+            <div class="s-value" id="summaryCost">$0</div>
+          </div>
+          <div class="summary-stat">
+            <div class="s-label">累積股數</div>
+            <div class="s-value" id="summaryShares">0</div>
+          </div>
+          <div class="summary-stat">
+            <div class="s-label">平均成本</div>
+            <div class="s-value" id="summaryAvg">$0</div>
+          </div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-title"><span class="icon">👤</span> 我的基本資料</div>
         <div class="form-group">
@@ -720,25 +822,7 @@
       </div>
 
       <div class="card">
-        <div class="card-title"><span class="icon">📊</span> 目前持倉總覽</div>
-        <div class="stats-grid" id="statsGrid">
-          <div class="stat-box">
-            <div class="label">累積股數</div>
-            <div class="value" id="totalShares">0</div>
-          </div>
-          <div class="stat-box">
-            <div class="label">投入本金</div>
-            <div class="value" id="totalCost">$0</div>
-          </div>
-          <div class="stat-box highlight">
-            <div class="label">目前市值</div>
-            <div class="value" id="marketValue">$0</div>
-          </div>
-          <div class="stat-box gold">
-            <div class="label">平均成本</div>
-            <div class="value" id="avgCost">$0</div>
-          </div>
-        </div>
+        <div class="card-title"><span class="icon">📋</span> 買進明細</div>
         <div id="holdingsList">
           <div class="empty-state">
             <span class="emoji">🌱</span>
@@ -1060,10 +1144,24 @@
 
     function renderStats() {
       const t = getTotals();
-      document.getElementById('totalShares').textContent = t.totalShares.toLocaleString();
-      document.getElementById('totalCost').textContent = '$' + t.totalCost.toLocaleString();
-      document.getElementById('marketValue').textContent = '$' + Math.round(t.marketValue).toLocaleString();
-      document.getElementById('avgCost').textContent = '$' + (t.avgCost ? t.avgCost.toFixed(2) : '0');
+      
+      // 更新最上方總覽卡片
+      document.getElementById('summaryMarketValue').textContent = '$' + Math.round(t.marketValue).toLocaleString();
+      document.getElementById('summaryCost').textContent = '$' + t.totalCost.toLocaleString();
+      document.getElementById('summaryShares').textContent = t.totalShares.toLocaleString();
+      document.getElementById('summaryAvg').textContent = '$' + (t.avgCost ? t.avgCost.toFixed(2) : '0');
+
+      // 計算獲利百分比
+      const profitEl = document.getElementById('summaryProfit');
+      if (t.totalCost > 0) {
+        const profitPct = ((t.marketValue - t.totalCost) / t.totalCost) * 100;
+        const sign = profitPct >= 0 ? '+' : '';
+        profitEl.textContent = sign + profitPct.toFixed(2) + '%';
+        profitEl.className = 'summary-profit ' + (profitPct >= 0 ? 'positive' : 'negative');
+      } else {
+        profitEl.textContent = '—';
+        profitEl.className = 'summary-profit';
+      }
     }
 
     function renderHoldings() {
