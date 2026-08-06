@@ -840,6 +840,23 @@
   <div class="toast" id="toast"></div>
 
   <script>
+    // ========== Google Apps Script API ==========
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDvg739xnJVQXRXVFX0pUwo2BpVIkEcup0HqZuFG_8c0Em-ucElsWaWLjtRRJgkMZH/exec';
+
+    function sendToGoogle(payload) {
+      // 使用 no-cors + text/plain 避免跨網域問題
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: JSON.stringify(payload)
+      }).catch(err => {
+        console.log('傳送資料時發生錯誤（可忽略）', err);
+      });
+    }
+
     // ========== 資料結構 ==========
     let profile = {
       nickname: '',
@@ -909,7 +926,20 @@
       profile.currentPrice = parseFloat(document.getElementById('currentPrice').value) || 180;
       saveData();
       renderStats();
-      showToast('個人資料已儲存');
+
+      // 傳送到 Google 試算表
+      const targetMonthly = parseFloat(document.getElementById('targetMonthly')?.value) || '';
+      const annualReturn = parseFloat(document.getElementById('annualReturn')?.value) || 10;
+      sendToGoogle({
+        type: 'profile',
+        nickname: profile.nickname,
+        birthYear: profile.birthYear,
+        currentPrice: profile.currentPrice,
+        targetMonthly: targetMonthly,
+        annualReturn: annualReturn
+      });
+
+      showToast('個人資料已儲存並同步至雲端');
       document.getElementById('rankName').value = profile.nickname;
     }
 
@@ -924,12 +954,14 @@
         return;
       }
 
+      const cost = Math.round(shares * price);
+
       purchases.push({
         id: Date.now(),
         date,
         shares,
         price,
-        cost: Math.round(shares * price)
+        cost
       });
 
       document.getElementById('shares').value = '';
@@ -937,7 +969,19 @@
 
       saveData();
       renderAll();
-      showToast('已加入持倉');
+
+      // 傳送到 Google 試算表
+      sendToGoogle({
+        type: 'purchase',
+        nickname: profile.nickname || '匿名',
+        buyDate: date,
+        shares: shares,
+        price: price,
+        cost: cost,
+        currentPrice: profile.currentPrice || ''
+      });
+
+      showToast('已加入持倉並同步至雲端');
     }
 
     function deletePurchase(id) {
@@ -1103,7 +1147,18 @@
       saveData();
       updateChart();
       renderLeaderList();
-      showToast('排行榜已更新');
+
+      // 傳送到 Google 試算表
+      const t = getTotals();
+      sendToGoogle({
+        type: 'ranking',
+        nickname: name,
+        marketValue: value,
+        totalShares: t.totalShares,
+        totalCost: t.totalCost
+      });
+
+      showToast('排行榜已更新並同步至雲端');
     }
 
     function syncMyValue() {
