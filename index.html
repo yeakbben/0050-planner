@@ -721,82 +721,6 @@
       margin-top: 8px;
     }
 
-    /* ========== Leaderboard ========== */
-    .leader-item {
-      display: flex;
-      align-items: center;
-      padding: 14px 0;
-      border-bottom: 1px solid #f1f5f9;
-      transition: background 0.2s;
-    }
-
-    .leader-item:last-child {
-      border-bottom: none;
-    }
-
-    .rank {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #f1f5f9;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.88rem;
-      margin-right: 14px;
-      flex-shrink: 0;
-      color: var(--text-secondary);
-    }
-
-    .rank.gold {
-      background: linear-gradient(135deg, #fef9c3, #fde68a);
-      color: #a16207;
-      box-shadow: 0 2px 8px rgba(201, 162, 39, 0.3);
-    }
-
-    .rank.silver {
-      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-      color: #475569;
-    }
-
-    .rank.bronze {
-      background: linear-gradient(135deg, #ffedd5, #fed7aa);
-      color: #c2410c;
-    }
-
-    .leader-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .leader-name {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--navy);
-    }
-
-    .leader-value {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      margin-top: 2px;
-    }
-
-    .leader-bar {
-      height: 5px;
-      background: #f1f5f9;
-      border-radius: 3px;
-      margin-top: 8px;
-      overflow: hidden;
-    }
-
-    .leader-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #0f172a, #c9a227);
-      border-radius: 3px;
-      transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
     /* ========== Assumptions ========== */
     .assumptions {
       font-size: 0.76rem;
@@ -1230,21 +1154,26 @@
       fetch(GOOGLE_SCRIPT_URL + '?action=getPrice')
         .then(res => res.json())
         .then(data => {
-          if (data && data.price) {
+          if (data && data.price !== undefined && data.price !== '') {
             const price = parseFloat(data.price);
             if (!isNaN(price) && price > 0) {
               profile.currentPrice = price;
               const sp = document.getElementById('summaryPrice');
               if (sp) sp.textContent = '0050 即時價：$' + price;
               saveData();
-              renderStats(); // 重新計算市值
-              showToast('已自動更新 0050 股價：' + price);
+              renderStats();
+              updateGrowthChart();
+              updateDashRetireProgress();
             }
+          } else {
+            const sp = document.getElementById('summaryPrice');
+            if (sp) sp.textContent = '0050 即時價：取得失敗';
           }
         })
         .catch(err => {
           console.log('無法自動取得股價', err);
-          document.getElementById('summaryPrice').textContent = '0050 即時價：取得失敗';
+          const sp = document.getElementById('summaryPrice');
+          if (sp) sp.textContent = '0050 即時價：取得失敗';
         });
     }
 
