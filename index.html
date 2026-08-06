@@ -51,8 +51,7 @@
       background: linear-gradient(145deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
       color: white;
       padding: 16px 18px 18px;
-      position: sticky;
-      top: 0;
+      position: relative;
       z-index: 100;
       box-shadow: 0 4px 24px rgba(15, 23, 42, 0.35);
       overflow: hidden;
@@ -109,30 +108,32 @@
     /* ========== Tabs ========== */
     .tabs {
       display: flex;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
+      background: #fff;
       border-bottom: 1px solid var(--border);
       position: sticky;
-      top: 148px;
-      z-index: 90;
+      top: 0;
+      z-index: 200;
       overflow-x: auto;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
     .tab {
       flex: 1;
       min-width: 95px;
-      padding: 15px 8px;
+      padding: 16px 8px;
       text-align: center;
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       font-weight: 500;
       color: var(--text-secondary);
-      background: none;
+      background: #fff;
       border: none;
       border-bottom: 2.5px solid transparent;
       cursor: pointer;
       transition: all 0.25s ease;
       position: relative;
+      z-index: 201;
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     .tab.active {
@@ -351,6 +352,66 @@
       opacity: 0.75;
       margin-bottom: 12px;
       font-weight: 500;
+    }
+
+    /* ========== 本月入金 ========== */
+    .month-progress-box {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .month-progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .month-badge {
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .month-badge.done {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .month-badge.pending {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .month-progress-bar {
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .month-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #059669, #34d399);
+      border-radius: 6px;
+      transition: width 0.5s ease;
+    }
+
+    .month-progress-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .card-title {
+      justify-content: flex-start;
     }
 
     /* ========== Dividend page ========== */
@@ -833,6 +894,43 @@
           </div>
         </div>
       </div>
+
+      <!-- 本月入金狀況 -->
+      <div class="card">
+        <div class="card-title">
+          <span class="icon">📅</span> 本月入金狀況
+          <span id="monthLabel" style="font-size:0.8rem; font-weight:500; color:var(--text-secondary); margin-left:auto;"></span>
+        </div>
+        <div class="form-group">
+          <label>每月目標入金（元）</label>
+          <input type="number" id="monthlyTarget" placeholder="例如：10000" min="0" step="1000" value="10000">
+        </div>
+        <div class="month-progress-box">
+          <div class="month-progress-header">
+            <span id="monthPaidText">本月已投入 $0</span>
+            <span id="monthStatusBadge" class="month-badge pending">未達標</span>
+          </div>
+          <div class="month-progress-bar">
+            <div class="month-progress-fill" id="monthProgressFill" style="width:0%"></div>
+          </div>
+          <div class="month-progress-footer">
+            <span id="monthTargetText">目標 $10,000</span>
+            <span id="monthPercentText">0%</span>
+          </div>
+        </div>
+        <button class="btn btn-outline" style="margin-top:12px;" onclick="saveMonthlyTarget()">儲存目標金額</button>
+      </div>
+
+      <!-- 資產成長圖 -->
+      <div class="card">
+        <div class="card-title"><span class="icon">📊</span> 資產成長與本金對比</div>
+        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+          依買進紀錄累計。灰色＝累計本金，綠色＝以目前股價估算的市值。
+        </p>
+        <div class="chart-container" style="height:260px;">
+          <canvas id="growthChart"></canvas>
+        </div>
+      </div>
     </div>
 
     <!-- ========== 退休試算 ========== -->
@@ -962,20 +1060,13 @@
     let profile = {
       nickname: '',
       birthYear: null,
-      currentPrice: 180
+      currentPrice: 180,
+      monthlyTarget: 10000
     };
 
+    let growthChart = null;
+
     let purchases = []; // {id, date, shares, price, cost}
-
-    let leaders = [
-      { name: '阿強', value: 186000 },
-      { name: '小美', value: 142500 },
-      { name: '老王', value: 98000 },
-      { name: '小華', value: 67500 },
-      { name: '阿玲', value: 42000 }
-    ];
-
-    let rankChart = null;
 
     // ========== 初始化 ==========
     document.addEventListener('DOMContentLoaded', () => {
@@ -1085,20 +1176,26 @@
     function saveData() {
       localStorage.setItem('0050_profile', JSON.stringify(profile));
       localStorage.setItem('0050_purchases', JSON.stringify(purchases));
-      localStorage.setItem('0050_leaders', JSON.stringify(leaders));
     }
 
     function loadData() {
-      const p = localStorage.getItem('0050_profile');
-      const pu = localStorage.getItem('0050_purchases');
-      const l = localStorage.getItem('0050_leaders');
-      if (p) profile = JSON.parse(p);
-      if (pu) purchases = JSON.parse(pu);
-      if (l) leaders = JSON.parse(l);
+      try {
+        const p = localStorage.getItem('0050_profile');
+        const pu = localStorage.getItem('0050_purchases');
+        if (p) profile = Object.assign(profile, JSON.parse(p));
+        if (pu) purchases = JSON.parse(pu);
+      } catch (e) {
+        console.log('loadData error', e);
+      }
 
-      document.getElementById('nickname').value = profile.nickname || '';
-      document.getElementById('birthYear').value = profile.birthYear || '';
-      document.getElementById('currentPrice').value = profile.currentPrice || 180;
+      const nick = document.getElementById('nickname');
+      const by = document.getElementById('birthYear');
+      const cp = document.getElementById('currentPrice');
+      const mt = document.getElementById('monthlyTarget');
+      if (nick) nick.value = profile.nickname || '';
+      if (by) by.value = profile.birthYear || '';
+      if (cp) cp.value = profile.currentPrice || 180;
+      if (mt) mt.value = profile.monthlyTarget || 10000;
     }
 
     // ========== 個人資料 ==========
@@ -1325,125 +1422,158 @@
       document.getElementById('calcResultCard').style.display = 'block';
     }
 
-    // ========== 排行榜 ==========
-    function renderLeaderList() {
-      const list = document.getElementById('leaderList');
-      if (!list) return;
-      if (leaders.length === 0) {
-        list.innerHTML = `
-          <div class="empty-state">
-            <span class="emoji">🏆</span>
-            還沒有任何排行資料<br>快來更新你的成績吧！
-          </div>`;
-        return;
-      }
-
-      const maxValue = Math.max(...leaders.map(l => l.value), 1);
-      let html = '';
-      leaders.forEach((l, i) => {
-        const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-        const pct = (l.value / maxValue * 100).toFixed(1);
-        html += `
-          <div class="leader-item">
-            <div class="rank ${rankClass}">${i + 1}</div>
-            <div class="leader-info">
-              <div class="leader-name">${l.name}${i === 0 ? ' 👑' : ''}</div>
-              <div class="leader-value">市值 $${l.value.toLocaleString()}</div>
-              <div class="leader-bar">
-                <div class="leader-bar-fill" style="width:${pct}%"></div>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-      list.innerHTML = html;
-    }
-
-    function updateChart() {
-      const canvas = document.getElementById('rankChart');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const sorted = [...leaders].sort((a, b) => b.value - a.value);
-      const labels = sorted.map(l => l.name);
-      const data = sorted.map(l => l.value);
-
-      const colors = sorted.map((_, i) => {
-        if (i === 0) return '#c9a227';
-        if (i === 1) return '#94a3b8';
-        if (i === 2) return '#d97706';
-        return '#1e293b';
-      });
-
-      if (rankChart) {
-        rankChart.destroy();
-      }
-
-      rankChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: '目前市值',
-            data: data,
-            backgroundColor: colors,
-            borderRadius: 8,
-            borderSkipped: false,
-            barThickness: 22
-          }]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: '#0f172a',
-              titleFont: { family: 'Noto Sans TC', size: 13 },
-              bodyFont: { family: 'Noto Sans TC', size: 13 },
-              padding: 12,
-              cornerRadius: 8,
-              callbacks: {
-                label: function(context) {
-                  return '市值 $' + context.raw.toLocaleString();
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              beginAtZero: true,
-              ticks: {
-                font: { family: 'Noto Sans TC', size: 11 },
-                color: '#64748b',
-                callback: function(value) {
-                  if (value >= 10000) return (value / 10000) + '萬';
-                  return value;
-                }
-              },
-              grid: { color: '#f1f5f9', drawBorder: false }
-            },
-            y: {
-              ticks: {
-                font: { family: 'Noto Sans TC', size: 12, weight: '500' },
-                color: '#0f172a'
-              },
-              grid: { display: false }
-            }
-          }
-        }
-      });
-    }
-
     // ========== 工具 ==========
     function renderAll() {
       try {
         renderStats();
         renderHoldings();
         updateDividendInfo();
+        updateMonthlyProgress();
+        updateGrowthChart();
       } catch (e) {
         console.log('renderAll error', e);
       }
+    }
+
+    // ========== 本月入金狀況 ==========
+    function saveMonthlyTarget() {
+      const val = parseFloat(document.getElementById('monthlyTarget').value) || 10000;
+      profile.monthlyTarget = val;
+      saveData();
+      updateMonthlyProgress();
+      showToast('每月目標已儲存');
+    }
+
+    function updateMonthlyProgress() {
+      const now = new Date();
+      const yearMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      const label = document.getElementById('monthLabel');
+      if (label) label.textContent = '(' + yearMonth.replace('-', '/') + ')';
+
+      const target = profile.monthlyTarget || 10000;
+      const paid = purchases
+        .filter(p => p.date && p.date.startsWith(yearMonth))
+        .reduce((sum, p) => sum + (p.cost || 0), 0);
+
+      const pct = target > 0 ? Math.min(100, (paid / target) * 100) : 0;
+      const done = paid >= target;
+
+      const paidEl = document.getElementById('monthPaidText');
+      const badgeEl = document.getElementById('monthStatusBadge');
+      const fillEl = document.getElementById('monthProgressFill');
+      const targetEl = document.getElementById('monthTargetText');
+      const pctEl = document.getElementById('monthPercentText');
+
+      if (paidEl) paidEl.textContent = '本月已投入 $' + paid.toLocaleString();
+      if (targetEl) targetEl.textContent = '目標 $' + target.toLocaleString();
+      if (pctEl) pctEl.textContent = pct.toFixed(0) + '%';
+      if (fillEl) fillEl.style.width = pct + '%';
+      if (badgeEl) {
+        badgeEl.textContent = done ? '已達標' : '未達標';
+        badgeEl.className = 'month-badge ' + (done ? 'done' : 'pending');
+      }
+    }
+
+    // ========== 資產成長圖 ==========
+    function updateGrowthChart() {
+      const canvas = document.getElementById('growthChart');
+      if (!canvas || typeof Chart === 'undefined') return;
+
+      // 依月份累計本金
+      const monthMap = {};
+      const sorted = [...purchases].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+      let runningCost = 0;
+      let runningShares = 0;
+
+      sorted.forEach(p => {
+        if (!p.date) return;
+        const ym = p.date.substring(0, 7); // YYYY-MM
+        runningCost += p.cost || 0;
+        runningShares += p.shares || 0;
+        monthMap[ym] = {
+          cost: runningCost,
+          shares: runningShares
+        };
+      });
+
+      const labels = Object.keys(monthMap).sort();
+      const costData = labels.map(k => monthMap[k].cost);
+      const valueData = labels.map(k => Math.round(monthMap[k].shares * (profile.currentPrice || 0)));
+
+      // 顯示用標籤：2026-03 → 03月
+      const displayLabels = labels.map(k => {
+        const m = k.split('-')[1];
+        return parseInt(m, 10) + '月';
+      });
+
+      if (growthChart) {
+        growthChart.destroy();
+        growthChart = null;
+      }
+
+      if (labels.length === 0) {
+        return;
+      }
+
+      growthChart = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: displayLabels,
+          datasets: [
+            {
+              label: '累計本金',
+              data: costData,
+              backgroundColor: 'rgba(148, 163, 184, 0.7)',
+              borderRadius: 4,
+              barPercentage: 0.7
+            },
+            {
+              label: '總資產估值',
+              data: valueData,
+              backgroundColor: 'rgba(5, 150, 105, 0.75)',
+              borderRadius: 4,
+              barPercentage: 0.7
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                font: { family: 'Noto Sans TC', size: 12 },
+                boxWidth: 12
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) {
+                  return ctx.dataset.label + ' $' + Number(ctx.raw).toLocaleString();
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { font: { family: 'Noto Sans TC', size: 11 } },
+              grid: { display: false }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: {
+                font: { family: 'Noto Sans TC', size: 11 },
+                callback: function(v) {
+                  if (v >= 10000) return (v / 10000) + '萬';
+                  return v;
+                }
+              },
+              grid: { color: '#f1f5f9' }
+            }
+          }
+        }
+      });
     }
 
     function showToast(msg) {
