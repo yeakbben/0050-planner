@@ -10,21 +10,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --navy: #0f172a;
-      --navy-light: #1e293b;
-      --gold: #c9a227;
-      --gold-light: #e8d48b;
-      --emerald: #059669;
-      --emerald-soft: #d1fae5;
+      --navy: #1a2b3c;
+      --navy-light: #2c3e50;
+      --gold: #d4a017;
+      --gold-soft: #fbf6e9;
+      --gold-light: #f0d78c;
+      --emerald: #0d9488;
+      --emerald-soft: #e6f7f5;
       --rose: #e11d48;
-      --bg: #f1f5f9;
+      --bg: #f7f8fa;
       --card: #ffffff;
-      --text: #0f172a;
-      --text-secondary: #64748b;
-      --border: #e2e8f0;
-      --radius: 16px;
-      --shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
-      --shadow-hover: 0 8px 30px rgba(15, 23, 42, 0.1);
+      --text: #1a2b3c;
+      --text-secondary: #6b7c8a;
+      --border: #e8ecf0;
+      --radius: 18px;
+      --shadow: 0 2px 12px rgba(26, 43, 60, 0.05);
+      --shadow-hover: 0 6px 24px rgba(26, 43, 60, 0.08);
     }
 
     * {
@@ -37,9 +38,9 @@
     body {
       font-family: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
       background: var(--bg);
-      background-image: 
-        radial-gradient(ellipse at 20% 0%, rgba(201, 162, 39, 0.08) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 100%, rgba(5, 150, 105, 0.06) 0%, transparent 50%);
+      background-image:
+        radial-gradient(ellipse at 10% 0%, rgba(212, 160, 23, 0.07) 0%, transparent 45%),
+        radial-gradient(ellipse at 90% 100%, rgba(13, 148, 136, 0.06) 0%, transparent 45%);
       color: var(--text);
       line-height: 1.6;
       padding-bottom: 60px;
@@ -48,34 +49,36 @@
 
     /* ========== Header ========== */
     .header {
-      background: linear-gradient(145deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
-      color: white;
-      padding: 16px 18px 18px;
+      background: linear-gradient(160deg, #ffffff 0%, #fbf8f0 50%, #f3faf8 100%);
+      color: var(--text);
+      padding: 18px 18px 20px;
       position: relative;
       z-index: 100;
-      box-shadow: 0 4px 24px rgba(15, 23, 42, 0.35);
+      box-shadow: 0 2px 16px rgba(26, 43, 60, 0.06);
+      border-bottom: 1px solid var(--border);
       overflow: hidden;
     }
 
     .header::before {
-      content: "";
+      content: "¥";
       position: absolute;
-      top: -40%;
-      right: -20%;
-      width: 280px;
-      height: 280px;
-      background: radial-gradient(circle, rgba(201, 162, 39, 0.18) 0%, transparent 70%);
+      top: -10px;
+      right: 12px;
+      font-size: 120px;
+      font-weight: 700;
+      color: rgba(212, 160, 23, 0.06);
       pointer-events: none;
+      line-height: 1;
     }
 
     .header::after {
       content: "";
       position: absolute;
-      bottom: -30%;
-      left: -10%;
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, rgba(5, 150, 105, 0.12) 0%, transparent 70%);
+      bottom: -40%;
+      left: -15%;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(13, 148, 136, 0.08) 0%, transparent 70%);
       pointer-events: none;
     }
 
@@ -95,14 +98,14 @@
 
     .header-badge {
       display: inline-block;
-      background: rgba(201, 162, 39, 0.2);
-      color: var(--gold-light);
-      font-size: 0.68rem;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      padding: 3px 9px;
+      background: var(--gold-soft);
+      color: #9a7b0a;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 4px 12px;
       border-radius: 20px;
-      border: 1px solid rgba(201, 162, 39, 0.3);
+      border: 1px solid rgba(212, 160, 23, 0.25);
     }
 
     /* ========== Tabs ========== */
@@ -270,20 +273,20 @@
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      background: linear-gradient(135deg, #d4a017 0%, #b8860b 100%);
       color: white;
-      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+      box-shadow: 0 4px 14px rgba(212, 160, 23, 0.3);
     }
 
     .btn-primary:active {
       transform: scale(0.98);
-      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
+      box-shadow: 0 2px 8px rgba(212, 160, 23, 0.25);
     }
 
     .btn-success {
-      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
       color: white;
-      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
+      box-shadow: 0 4px 14px rgba(13, 148, 136, 0.28);
     }
 
     .btn-success:active {
@@ -321,10 +324,11 @@
     }
 
     .summary-value {
-      font-size: 1.9rem;
+      font-size: 2rem;
       font-weight: 700;
       letter-spacing: -0.03em;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
+      color: var(--navy);
     }
 
     .summary-profit {
@@ -333,25 +337,47 @@
       display: inline-block;
       padding: 3px 10px;
       border-radius: 20px;
-      background: rgba(255,255,255,0.1);
+      background: #f1f5f9;
+      color: var(--text-secondary);
       flex-shrink: 0;
     }
 
     .summary-profit.positive {
-      color: #34d399;
-      background: rgba(52, 211, 153, 0.15);
+      color: #0d9488;
+      background: var(--emerald-soft);
     }
 
     .summary-profit.negative {
-      color: #f87171;
-      background: rgba(248, 113, 113, 0.15);
+      color: #e11d48;
+      background: #fff1f2;
     }
 
     .summary-price {
-      font-size: 0.8rem;
-      opacity: 0.75;
-      margin-bottom: 12px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
       font-weight: 500;
+    }
+
+    /* ========== 儀表板卡片 ========== */
+    .dash-card {
+      border: 1px solid rgba(212, 160, 23, 0.15);
+      background: linear-gradient(165deg, #ffffff 0%, #fbfaf6 100%);
+    }
+
+    .dash-progress-pct {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--emerald);
+      letter-spacing: -0.02em;
+      text-align: center;
+    }
+
+    .dash-progress-detail {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.55;
     }
 
     /* ========== 本月入金 ========== */
@@ -517,23 +543,28 @@
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
-      border-top: 1px solid rgba(255,255,255,0.12);
-      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
     }
 
     .summary-stat {
       text-align: center;
+      background: rgba(255,255,255,0.7);
+      border-radius: 12px;
+      padding: 8px 4px;
+      border: 1px solid var(--border);
     }
 
     .summary-stat .s-label {
       font-size: 0.7rem;
-      opacity: 0.65;
+      color: var(--text-secondary);
       margin-bottom: 3px;
     }
 
     .summary-stat .s-value {
       font-size: 0.92rem;
-      font-weight: 600;
+      font-weight: 700;
+      color: var(--navy);
     }
 
     /* ========== Stats ========== */
@@ -920,20 +951,56 @@
   <div class="container">
     <!-- ========== 個人紀錄 ========== -->
     <div id="record" class="section active">
-      <div class="card">
-        <div class="card-title"><span class="icon">👤</span> 我的基本資料</div>
-        <div class="form-group">
-          <label>暱稱</label>
-          <input type="text" id="nickname" placeholder="例如：小明" maxlength="12">
+
+      <!-- 儀表板：退休進度 -->
+      <div class="card dash-card">
+        <div class="card-title"><span class="icon">🎯</span> 退休目標進度</div>
+        <div class="dash-progress-pct" id="dashRetirePct">—</div>
+        <div class="month-progress-bar" style="margin:10px 0 12px;">
+          <div class="month-progress-fill" id="dashRetireFill" style="width:0%"></div>
         </div>
-        <div class="form-group">
-          <label>出生年份</label>
-          <input type="number" id="birthYear" placeholder="例如：1990" min="1950" max="2010">
-        </div>
-        <button class="btn btn-primary" onclick="saveProfile()">儲存個人資料</button>
+        <div class="dash-progress-detail" id="dashRetireDetail">請先在「退休試算」設定每月生活費目標</div>
       </div>
 
+      <!-- 儀表板：本月入金 -->
+      <div class="card dash-card">
+        <div class="card-title">
+          <span class="icon">📅</span> 本月入金狀況
+          <span id="monthLabel" style="font-size:0.8rem; font-weight:500; color:var(--text-secondary); margin-left:auto;"></span>
+        </div>
+        <div class="month-progress-box">
+          <div class="month-progress-header">
+            <span id="monthPaidText">本月已投入 $0</span>
+            <span id="monthStatusBadge" class="month-badge pending">未達標</span>
+          </div>
+          <div class="month-progress-bar">
+            <div class="month-progress-fill" id="monthProgressFill" style="width:0%"></div>
+          </div>
+          <div class="month-progress-footer">
+            <span id="monthTargetText">目標 $10,000</span>
+            <span id="monthPercentText">0%</span>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:12px; margin-bottom:8px;">
+          <label>每月目標入金（元）</label>
+          <input type="number" id="monthlyTarget" placeholder="例如：10000" min="0" step="1000" value="10000">
+        </div>
+        <button class="btn btn-outline" onclick="saveMonthlyTarget()">儲存目標金額</button>
+        <button class="btn btn-success" style="margin-top:8px;" id="ctaAddPurchase" onclick="document.getElementById('addPurchaseCard').scrollIntoView({behavior:'smooth'})">＋ 去新增本月買進</button>
+      </div>
+
+      <!-- 資產成長圖 -->
       <div class="card">
+        <div class="card-title"><span class="icon">📊</span> 資產成長與本金對比</div>
+        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+          依買進紀錄累計。灰色＝累計本金，青綠色＝以目前股價估算的市值。
+        </p>
+        <div class="chart-container" style="height:260px;">
+          <canvas id="growthChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card" id="addPurchaseCard">
         <div class="card-title"><span class="icon">📝</span> 新增買進紀錄</div>
         <div class="form-row">
           <div class="form-group">
@@ -962,41 +1029,17 @@
         </div>
       </div>
 
-      <!-- 本月入金狀況 -->
       <div class="card">
-        <div class="card-title">
-          <span class="icon">📅</span> 本月入金狀況
-          <span id="monthLabel" style="font-size:0.8rem; font-weight:500; color:var(--text-secondary); margin-left:auto;"></span>
+        <div class="card-title"><span class="icon">👤</span> 我的基本資料</div>
+        <div class="form-group">
+          <label>暱稱</label>
+          <input type="text" id="nickname" placeholder="例如：小明" maxlength="12">
         </div>
         <div class="form-group">
-          <label>每月目標入金（元）</label>
-          <input type="number" id="monthlyTarget" placeholder="例如：10000" min="0" step="1000" value="10000">
+          <label>出生年份</label>
+          <input type="number" id="birthYear" placeholder="例如：1990" min="1950" max="2010">
         </div>
-        <div class="month-progress-box">
-          <div class="month-progress-header">
-            <span id="monthPaidText">本月已投入 $0</span>
-            <span id="monthStatusBadge" class="month-badge pending">未達標</span>
-          </div>
-          <div class="month-progress-bar">
-            <div class="month-progress-fill" id="monthProgressFill" style="width:0%"></div>
-          </div>
-          <div class="month-progress-footer">
-            <span id="monthTargetText">目標 $10,000</span>
-            <span id="monthPercentText">0%</span>
-          </div>
-        </div>
-        <button class="btn btn-outline" style="margin-top:12px;" onclick="saveMonthlyTarget()">儲存目標金額</button>
-      </div>
-
-      <!-- 資產成長圖 -->
-      <div class="card">
-        <div class="card-title"><span class="icon">📊</span> 資產成長與本金對比</div>
-        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
-          依買進紀錄累計。灰色＝累計本金，綠色＝以目前股價估算的市值。
-        </p>
-        <div class="chart-container" style="height:260px;">
-          <canvas id="growthChart"></canvas>
-        </div>
+        <button class="btn btn-primary" onclick="saveProfile()">儲存個人資料</button>
       </div>
     </div>
 
@@ -1153,7 +1196,8 @@
       nickname: '',
       birthYear: null,
       currentPrice: 180,
-      monthlyTarget: 10000
+      monthlyTarget: 10000,
+      targetLifeMonthly: null
     };
 
     let growthChart = null;
@@ -1552,6 +1596,10 @@
         return;
       }
 
+      // 記住生活費目標，首屏可顯示進度
+      profile.targetLifeMonthly = targetMonthly;
+      saveData();
+
       const currentYear = new Date().getFullYear();
       const yearsLeft = 60 - (currentYear - birthYear);
       document.getElementById('yearsLeft').textContent = yearsLeft + ' 年';
@@ -1626,6 +1674,8 @@
             ? '🎉 目前資產已達到或超過目標本金！'
             : '還差 $' + Math.round(neededCapital - currentMV).toLocaleString() + ' 即可達成目標本金');
       }
+
+      updateDashRetireProgress();
     }
 
     // ========== 本月全員買進狀況 ==========
@@ -1689,9 +1739,45 @@
         updateDividendInfo();
         updateMonthlyProgress();
         updateGrowthChart();
+        updateDashRetireProgress();
       } catch (e) {
         console.log('renderAll error', e);
       }
+    }
+
+    // 首屏退休進度（依 4% 法則目標本金）
+    function updateDashRetireProgress() {
+      const pctEl = document.getElementById('dashRetirePct');
+      const fillEl = document.getElementById('dashRetireFill');
+      const detailEl = document.getElementById('dashRetireDetail');
+      if (!pctEl) return;
+
+      const targetLife = profile.targetLifeMonthly;
+      if (!targetLife || targetLife <= 0) {
+        pctEl.textContent = '—';
+        if (fillEl) fillEl.style.width = '0%';
+        if (detailEl) detailEl.textContent = '請先到「退休試算」設定每月生活費目標';
+        return;
+      }
+
+      const neededCapital = (targetLife * 12) / 0.04;
+      const t = getTotals();
+      const currentMV = t.marketValue;
+      const pct = neededCapital > 0 ? Math.min(100, (currentMV / neededCapital) * 100) : 0;
+
+      pctEl.textContent = pct.toFixed(1) + '%';
+      if (fillEl) fillEl.style.width = pct + '%';
+      if (detailEl) {
+        detailEl.innerHTML =
+          '目前 $' + Math.round(currentMV).toLocaleString() +
+          ' ／ 目標本金 $' + Math.round(neededCapital).toLocaleString() +
+          '（每月生活費 $' + Number(targetLife).toLocaleString() + '）' +
+          (pct >= 100 ? '<br>🎉 已達成目標本金！' : '<br>還差 $' + Math.round(Math.max(0, neededCapital - currentMV)).toLocaleString());
+      }
+
+      // 同步試算頁的生活費輸入
+      const tm = document.getElementById('targetMonthly');
+      if (tm && !tm.value) tm.value = targetLife;
     }
 
     // ========== 本月入金狀況 ==========
@@ -1730,6 +1816,11 @@
       if (badgeEl) {
         badgeEl.textContent = done ? '已達標' : '未達標';
         badgeEl.className = 'month-badge ' + (done ? 'done' : 'pending');
+      }
+
+      const cta = document.getElementById('ctaAddPurchase');
+      if (cta) {
+        cta.textContent = done ? '✓ 本月已達標，可再加碼' : '＋ 去新增本月買進';
       }
     }
 
