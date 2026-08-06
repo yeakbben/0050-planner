@@ -50,7 +50,7 @@
     .header {
       background: linear-gradient(145deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
       color: white;
-      padding: 22px 20px 26px;
+      padding: 16px 18px 18px;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -83,42 +83,37 @@
     .header-content {
       position: relative;
       z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .header-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
     }
 
     .header-badge {
       display: inline-block;
       background: rgba(201, 162, 39, 0.2);
       color: var(--gold-light);
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 500;
       letter-spacing: 0.05em;
-      padding: 4px 10px;
+      padding: 3px 9px;
       border-radius: 20px;
-      margin-bottom: 10px;
       border: 1px solid rgba(201, 162, 39, 0.3);
-    }
-
-    .header h1 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 6px;
-    }
-
-    .header p {
-      font-size: 0.82rem;
-      opacity: 0.75;
-      font-weight: 300;
     }
 
     /* ========== Tabs ========== */
     .tabs {
       display: flex;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       position: sticky;
-      top: 92px;
+      top: 148px;
       z-index: 90;
       overflow-x: auto;
       box-shadow: 0 1px 0 rgba(0,0,0,0.03);
@@ -316,55 +311,26 @@
       border: none;
     }
 
-    /* ========== Summary Card (最上方總覽) ========== */
-    .summary-card {
-      background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
-      color: white;
-      border-radius: 20px;
-      padding: 24px 20px 20px;
-      margin-bottom: 18px;
-      box-shadow: 0 8px 30px rgba(15, 23, 42, 0.25);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .summary-card::before {
-      content: "";
-      position: absolute;
-      top: -30%;
-      right: -15%;
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, rgba(201, 162, 39, 0.2) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
+    /* ========== Header 內的總覽數據 ========== */
     .summary-label {
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       opacity: 0.7;
-      margin-bottom: 6px;
+      margin-bottom: 2px;
       font-weight: 500;
     }
 
-    .summary-value-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
-      gap: 12px;
-    }
-
     .summary-value {
-      font-size: 2.1rem;
+      font-size: 1.9rem;
       font-weight: 700;
       letter-spacing: -0.03em;
+      margin-bottom: 2px;
     }
 
     .summary-profit {
-      font-size: 0.95rem;
+      font-size: 0.88rem;
       font-weight: 600;
       display: inline-block;
-      padding: 4px 12px;
+      padding: 3px 10px;
       border-radius: 20px;
       background: rgba(255,255,255,0.1);
       flex-shrink: 0;
@@ -381,9 +347,9 @@
     }
 
     .summary-price {
-      font-size: 0.84rem;
+      font-size: 0.8rem;
       opacity: 0.75;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       font-weight: 500;
     }
 
@@ -417,9 +383,9 @@
     .summary-stats {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      padding-top: 16px;
+      gap: 8px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding-top: 12px;
     }
 
     .summary-stat {
@@ -427,13 +393,13 @@
     }
 
     .summary-stat .s-label {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       opacity: 0.65;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .summary-stat .s-value {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 600;
     }
 
@@ -789,9 +755,27 @@
 <body>
   <div class="header">
     <div class="header-content">
-      <div class="header-badge">長期複利 · 共同成長</div>
-      <h1>0050 存股退休規劃</h1>
-      <p>每月存股 · 目標 60 歲退休 · 全員競賽加油</p>
+      <div class="header-top-row">
+        <div class="header-badge">長期複利 · 共同成長</div>
+        <div class="summary-profit" id="summaryProfit">—</div>
+      </div>
+      <div class="summary-label">0050 總資產估值</div>
+      <div class="summary-value" id="summaryMarketValue">$0</div>
+      <div class="summary-price" id="summaryPrice">0050 即時價：載入中...</div>
+      <div class="summary-stats">
+        <div class="summary-stat">
+          <div class="s-label">投入本金</div>
+          <div class="s-value" id="summaryCost">$0</div>
+        </div>
+        <div class="summary-stat">
+          <div class="s-label">累積股數</div>
+          <div class="s-value" id="summaryShares">0</div>
+        </div>
+        <div class="summary-stat">
+          <div class="s-label">平均成本</div>
+          <div class="s-value" id="summaryAvg">$0</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -804,31 +788,6 @@
   <div class="container">
     <!-- ========== 個人紀錄 ========== -->
     <div id="record" class="section active">
-
-      <!-- 最上方總覽卡片 -->
-      <div class="summary-card" id="summaryCard">
-        <div class="summary-label">0050 總資產估值</div>
-        <div class="summary-value-row">
-          <div class="summary-value" id="summaryMarketValue">$0</div>
-          <div class="summary-profit" id="summaryProfit">—</div>
-        </div>
-        <div class="summary-price" id="summaryPrice">0050 即時價：載入中...</div>
-        <div class="summary-stats">
-          <div class="summary-stat">
-            <div class="s-label">投入本金</div>
-            <div class="s-value" id="summaryCost">$0</div>
-          </div>
-          <div class="summary-stat">
-            <div class="s-label">累積股數</div>
-            <div class="s-value" id="summaryShares">0</div>
-          </div>
-          <div class="summary-stat">
-            <div class="s-label">平均成本</div>
-            <div class="s-value" id="summaryAvg">$0</div>
-          </div>
-        </div>
-      </div>
-
       <div class="card">
         <div class="card-title"><span class="icon">👤</span> 我的基本資料</div>
         <div class="form-group">
