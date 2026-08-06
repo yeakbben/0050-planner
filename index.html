@@ -957,7 +957,7 @@
       saveData();
       renderStats();
 
-      // 傳送到 Google 試算表
+      // 傳送到 Google 試算表（個人資料）
       const targetMonthly = parseFloat(document.getElementById('targetMonthly')?.value) || '';
       const annualReturn = parseFloat(document.getElementById('annualReturn')?.value) || 10;
       sendToGoogle({
@@ -969,8 +969,26 @@
         annualReturn: annualReturn
       });
 
-      showToast('個人資料已儲存並同步至雲端');
+      // 自動同步目前市值到全員排行
+      autoSyncRanking();
+
+      showToast('個人資料已儲存，市值已同步至排行榜');
       document.getElementById('rankName').value = profile.nickname;
+    }
+
+    // 自動把目前市值同步到排行榜
+    function autoSyncRanking() {
+      if (!profile.nickname) return;
+      const t = getTotals();
+      if (t.marketValue <= 0) return;
+
+      sendToGoogle({
+        type: 'ranking',
+        nickname: profile.nickname,
+        marketValue: Math.round(t.marketValue),
+        totalShares: t.totalShares,
+        totalCost: t.totalCost
+      });
     }
 
     // ========== 買進紀錄 ==========
@@ -1000,7 +1018,7 @@
       saveData();
       renderAll();
 
-      // 傳送到 Google 試算表
+      // 傳送到 Google 試算表（買進紀錄）
       sendToGoogle({
         type: 'purchase',
         nickname: profile.nickname || '匿名',
@@ -1011,14 +1029,21 @@
         currentPrice: profile.currentPrice || ''
       });
 
-      showToast('已加入持倉並同步至雲端');
+      // 自動同步目前市值到全員排行
+      autoSyncRanking();
+
+      showToast('已加入持倉，市值已同步至排行榜');
     }
 
     function deletePurchase(id) {
       purchases = purchases.filter(p => p.id !== id);
       saveData();
       renderAll();
-      showToast('已刪除該筆紀錄');
+
+      // 刪除後也自動更新排行榜市值
+      autoSyncRanking();
+
+      showToast('已刪除該筆紀錄，市值已同步');
     }
 
     // ========== 計算統計 ==========
