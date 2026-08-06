@@ -353,66 +353,6 @@
       font-weight: 500;
     }
 
-    /* ========== 本月入金 ========== */
-    .month-progress-box {
-      background: #f8fafc;
-      border-radius: 12px;
-      padding: 14px;
-      border: 1px solid var(--border);
-    }
-
-    .month-progress-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
-    .month-badge {
-      font-size: 0.75rem;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-
-    .month-badge.done {
-      background: #d1fae5;
-      color: #047857;
-    }
-
-    .month-badge.pending {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-
-    .month-progress-bar {
-      height: 10px;
-      background: #e2e8f0;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .month-progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #059669, #34d399);
-      border-radius: 6px;
-      transition: width 0.5s ease;
-    }
-
-    .month-progress-footer {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-      font-size: 0.78rem;
-      color: var(--text-secondary);
-    }
-
-    .card-title {
-      justify-content: flex-start;
-    }
-
     /* ========== Dividend page ========== */
     .dividend-grid {
       display: grid;
@@ -893,43 +833,6 @@
           </div>
         </div>
       </div>
-
-      <!-- 本月入金狀況 -->
-      <div class="card">
-        <div class="card-title">
-          <span class="icon">📅</span> 本月入金狀況
-          <span id="monthLabel" style="font-size:0.8rem; font-weight:500; color:var(--text-secondary); margin-left:auto;"></span>
-        </div>
-        <div class="form-group">
-          <label>每月目標入金（元）</label>
-          <input type="number" id="monthlyTarget" placeholder="例如：10000" min="0" step="1000" value="10000">
-        </div>
-        <div class="month-progress-box">
-          <div class="month-progress-header">
-            <span id="monthPaidText">本月已投入 $0</span>
-            <span id="monthStatusBadge" class="month-badge pending">未達標</span>
-          </div>
-          <div class="month-progress-bar">
-            <div class="month-progress-fill" id="monthProgressFill" style="width:0%"></div>
-          </div>
-          <div class="month-progress-footer">
-            <span id="monthTargetText">目標 $10,000</span>
-            <span id="monthPercentText">0%</span>
-          </div>
-        </div>
-        <button class="btn btn-outline" style="margin-top:12px;" onclick="saveMonthlyTarget()">儲存目標金額</button>
-      </div>
-
-      <!-- 資產成長圖 -->
-      <div class="card">
-        <div class="card-title"><span class="icon">📊</span> 資產成長與本金對比</div>
-        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
-          依買進紀錄累計。灰色＝累計本金，綠色＝以目前股價估算的市值。
-        </p>
-        <div class="chart-container" style="height:260px;">
-          <canvas id="growthChart"></canvas>
-        </div>
-      </div>
     </div>
 
     <!-- ========== 退休試算 ========== -->
@@ -1059,11 +962,8 @@
     let profile = {
       nickname: '',
       birthYear: null,
-      currentPrice: 180,
-      monthlyTarget: 10000
+      currentPrice: 180
     };
-
-    let growthChart = null;
 
     let purchases = []; // {id, date, shares, price, cost}
 
@@ -1199,8 +1099,6 @@
       document.getElementById('nickname').value = profile.nickname || '';
       document.getElementById('birthYear').value = profile.birthYear || '';
       document.getElementById('currentPrice').value = profile.currentPrice || 180;
-      const mt = document.getElementById('monthlyTarget');
-      if (mt) mt.value = profile.monthlyTarget || 10000;
     }
 
     // ========== 個人資料 ==========
@@ -1390,4 +1288,170 @@
       const rAnnual = annualReturn / 100;
       const futureExisting = currentMV * Math.pow(1 + rAnnual, yearsLeft);
 
-      let rema
+      let remainingNeeded = neededCapital - futureExisting;
+      if (remainingNeeded < 0) remainingNeeded = 0;
+
+      const months = yearsLeft * 12;
+      const rMonthly = rAnnual / 12;
+      let monthlySave = 0;
+      if (remainingNeeded > 0 && months > 0) {
+        monthlySave = remainingNeeded * rMonthly / (Math.pow(1 + rMonthly, months) - 1);
+      }
+
+      let html = '';
+      if (remainingNeeded <= 0) {
+        html = `
+          <div class="result-box success">
+            <div class="sub">以目前持倉與 ${annualReturn}% 報酬率推估</div>
+            <div class="big-number">已達標！</div>
+            <div class="sub">退休時預估市值約 $${Math.round(futureExisting).toLocaleString()}，已超過目標本金 $${Math.round(neededCapital).toLocaleString()}</div>
+          </div>
+        `;
+      } else {
+        html = `
+          <div class="result-box">
+            <div class="sub">為了在 60 歲時達成每月 $${targetMonthly.toLocaleString()} 生活費</div>
+            <div class="big-number">每月至少存 $${Math.round(monthlySave).toLocaleString()}</div>
+            <div class="sub">
+              目標本金：$${Math.round(neededCapital).toLocaleString()}（4% 法則）<br>
+              現有持倉預估成長後：$${Math.round(futureExisting).toLocaleString()}<br>
+              還需再累積：$${Math.round(remainingNeeded).toLocaleString()}
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById('resultContent').innerHTML = html;
+      document.getElementById('calcResultCard').style.display = 'block';
+    }
+
+    // ========== 排行榜 ==========
+    function renderLeaderList() {
+      const list = document.getElementById('leaderList');
+      if (!list) return;
+      if (leaders.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <span class="emoji">🏆</span>
+            還沒有任何排行資料<br>快來更新你的成績吧！
+          </div>`;
+        return;
+      }
+
+      const maxValue = Math.max(...leaders.map(l => l.value), 1);
+      let html = '';
+      leaders.forEach((l, i) => {
+        const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+        const pct = (l.value / maxValue * 100).toFixed(1);
+        html += `
+          <div class="leader-item">
+            <div class="rank ${rankClass}">${i + 1}</div>
+            <div class="leader-info">
+              <div class="leader-name">${l.name}${i === 0 ? ' 👑' : ''}</div>
+              <div class="leader-value">市值 $${l.value.toLocaleString()}</div>
+              <div class="leader-bar">
+                <div class="leader-bar-fill" style="width:${pct}%"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      list.innerHTML = html;
+    }
+
+    function updateChart() {
+      const canvas = document.getElementById('rankChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const sorted = [...leaders].sort((a, b) => b.value - a.value);
+      const labels = sorted.map(l => l.name);
+      const data = sorted.map(l => l.value);
+
+      const colors = sorted.map((_, i) => {
+        if (i === 0) return '#c9a227';
+        if (i === 1) return '#94a3b8';
+        if (i === 2) return '#d97706';
+        return '#1e293b';
+      });
+
+      if (rankChart) {
+        rankChart.destroy();
+      }
+
+      rankChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '目前市值',
+            data: data,
+            backgroundColor: colors,
+            borderRadius: 8,
+            borderSkipped: false,
+            barThickness: 22
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0f172a',
+              titleFont: { family: 'Noto Sans TC', size: 13 },
+              bodyFont: { family: 'Noto Sans TC', size: 13 },
+              padding: 12,
+              cornerRadius: 8,
+              callbacks: {
+                label: function(context) {
+                  return '市值 $' + context.raw.toLocaleString();
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              ticks: {
+                font: { family: 'Noto Sans TC', size: 11 },
+                color: '#64748b',
+                callback: function(value) {
+                  if (value >= 10000) return (value / 10000) + '萬';
+                  return value;
+                }
+              },
+              grid: { color: '#f1f5f9', drawBorder: false }
+            },
+            y: {
+              ticks: {
+                font: { family: 'Noto Sans TC', size: 12, weight: '500' },
+                color: '#0f172a'
+              },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    // ========== 工具 ==========
+    function renderAll() {
+      try {
+        renderStats();
+        renderHoldings();
+        updateDividendInfo();
+      } catch (e) {
+        console.log('renderAll error', e);
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+  </script>
+</body>
+</html>
