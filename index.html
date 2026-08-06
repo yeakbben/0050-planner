@@ -1400,11 +1400,24 @@
     }
 
     function deletePurchase(id) {
+      const target = purchases.find(p => p.id === id);
+      if (!target) return;
+
+      // 同步刪除 Google 試算表中對應的那一筆
+      sendToGoogle({
+        type: 'deletePurchase',
+        nickname: profile.nickname || '匿名',
+        buyDate: target.date,
+        shares: target.shares,
+        price: target.price,
+        cost: target.cost
+      });
+
       purchases = purchases.filter(p => p.id !== id);
       saveData();
       renderAll();
       updateDividendInfo();
-      showToast('已刪除該筆紀錄');
+      showToast('已刪除該筆紀錄（含雲端）');
     }
 
     // ========== 計算統計 ==========
