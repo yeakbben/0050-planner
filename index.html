@@ -380,6 +380,13 @@
       background: rgba(248, 113, 113, 0.15);
     }
 
+    .summary-price {
+      font-size: 0.84rem;
+      opacity: 0.75;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+
     .summary-stats {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -778,6 +785,7 @@
           <div class="summary-value" id="summaryMarketValue">$0</div>
           <div class="summary-profit" id="summaryProfit">—</div>
         </div>
+        <div class="summary-price" id="summaryPrice">0050 即時價：載入中...</div>
         <div class="summary-stats">
           <div class="summary-stat">
             <div class="s-label">投入本金</div>
@@ -971,6 +979,7 @@
             if (!isNaN(price) && price > 0) {
               profile.currentPrice = price;
               document.getElementById('currentPrice').value = price;
+              document.getElementById('summaryPrice').textContent = '0050 即時價：$' + price;
               saveData();
               renderStats(); // 重新計算市值
               showToast('已自動更新 0050 股價：' + price);
@@ -979,6 +988,7 @@
         })
         .catch(err => {
           console.log('無法自動取得股價', err);
+          document.getElementById('summaryPrice').textContent = '0050 即時價：取得失敗';
         });
     }
 
@@ -1159,6 +1169,11 @@
       document.getElementById('summaryCost').textContent = '$' + t.totalCost.toLocaleString();
       document.getElementById('summaryShares').textContent = t.totalShares.toLocaleString();
       document.getElementById('summaryAvg').textContent = '$' + (t.avgCost ? t.avgCost.toFixed(2) : '0');
+      
+      // 顯示目前股價
+      if (profile.currentPrice) {
+        document.getElementById('summaryPrice').textContent = '0050 即時價：$' + profile.currentPrice;
+      }
 
       // 計算獲利百分比
       const profitEl = document.getElementById('summaryProfit');
