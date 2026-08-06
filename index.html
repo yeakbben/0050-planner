@@ -1214,8 +1214,8 @@
         renderAll();
         loadCurrentPrice();
         loadDividendInfo();
-        // 若本機已有暱稱，自動從雲端同步買進紀錄
-        if (profile.nickname && profile.nickname !== '匿名') {
+        // 僅在本機沒有買進紀錄時，才自動從雲端載入（避免覆蓋本機資料）
+        if (profile.nickname && profile.nickname !== '匿名' && purchases.length === 0) {
           loadMyPurchases(profile.nickname);
         }
       } catch (e) {
@@ -1407,7 +1407,7 @@
       updateDividendInfo();
     }
 
-    // 依暱稱從 Google 試算表載入買進紀錄
+    // 依暱稱從 Google 試算表載入買進紀錄（不會在雲端為空時清空本機）
     function loadMyPurchases(nickname) {
       if (!nickname || nickname === '匿名') return;
 
@@ -1415,29 +1415,39 @@
         .then(res => res.json())
         .then(data => {
           if (!data || !Array.isArray(data.purchases)) {
-            showToast('雲端尚無此暱稱的買進紀錄');
+            showToast('無法解析雲端資料，本機紀錄已保留');
             return;
           }
 
-          // 用雲端資料覆蓋本機持倉
-          purchases = data.purchases.map(function(p, idx) {
-            return {
-              id: Date.now() + idx,
-              date: p.date,
-              shares: Number(p.shares) || 0,
-              price: Number(p.price) || 0,
-              cost: Number(p.cost) || Math.round((Number(p.shares) || 0) * (Number(p.price) || 0))
-            };
-          });
+          // 雲端有資料 → 覆蓋本機（跨裝置同步）
+          if (data.purchases.length > 0) {
+            purchases = data.purchases.map(function(p, idx) {
+              return {
+                id: Date.now() + idx,
+                date: p.date,
+                shares: Number(p.shares) || 0,
+                price: Number(p.price) || 0,
+                cost: Number(p.cost) || Math.round((Number(p.shares) || 0) * (Number(p.price) || 0))
+              };
+            });
+            saveData();
+            renderAll();
+            updateDividendInfo();
+            showToast('已載入「' + nickname + '」的雲端紀錄（' + purchases.length + ' 筆）');
+            return;
+          }
 
-          saveData();
-          renderAll();
-          updateDividendInfo();
-          showToast('已載入「' + nickname + '」的雲端紀錄（' + purchases.length + ' 筆）');
+          // 雲端 0 筆：絕對不要清空本機
+          if (purchases.length > 0) {
+            showToast('雲端尚無「' + nickname + '」紀錄，已保留本機 ' + purchases.length + ' 筆');
+          } else {
+            showToast('「' + nickname + '」雲端尚無買進紀錄，可開始新增');
+          }
         })
         .catch(err => {
           console.log('載入雲端買進紀錄失敗', err);
-          showToast('無法載入雲端紀錄，請稍後再試');
+          // 失敗時也不動本機資料
+          showToast('無法連線雲端，本機紀錄已保留');
         });
     }
 
@@ -1451,6 +1461,15 @@
         showToast('請完整填寫日期、股數與金額');
         return;
       }
+
+      // 確保有暱稱，否則雲端無法對應到人
+      const nickInput = document.getElementById('nickname');
+      const nick = (nickInput && nickInput.value.trim()) || profile.nickname || '';
+      if (!nick || nick === '匿名') {
+        showToast('請先填寫暱稱並按「儲存個人資料」');
+        return;
+      }
+      profile.nickname = nick;
 
       const cost = Math.round(shares * price);
 
@@ -1471,7 +1490,7 @@
       // 傳送到 Google 試算表（買進紀錄）
       sendToGoogle({
         type: 'purchase',
-        nickname: profile.nickname || '匿名',
+        nickname: profile.nickname,
         buyDate: date,
         shares: shares,
         price: price,
