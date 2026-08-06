@@ -45,6 +45,42 @@
       line-height: 1.6;
       padding-bottom: 60px;
       min-height: 100vh;
+      position: relative;
+    }
+
+    /* 金錢符號背景 */
+    .money-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .money-bg span {
+      position: absolute;
+      font-weight: 700;
+      color: rgba(212, 160, 23, 0.14);
+      line-height: 1;
+      user-select: none;
+    }
+
+    .money-bg .s1 { top: 8%;  left: 6%;  font-size: 80px;  color: rgba(212, 160, 23, 0.16); }
+    .money-bg .s2 { top: 18%; right: 8%; font-size: 54px;  color: rgba(13, 148, 136, 0.14); transform: rotate(15deg); }
+    .money-bg .s3 { top: 42%; left: 4%;  font-size: 64px;  color: rgba(212, 160, 23, 0.13); transform: rotate(-12deg); }
+    .money-bg .s4 { top: 55%; right: 5%; font-size: 100px; color: rgba(212, 160, 23, 0.15); }
+    .money-bg .s5 { top: 72%; left: 12%; font-size: 48px;  color: rgba(13, 148, 136, 0.12); transform: rotate(8deg); }
+    .money-bg .s6 { top: 85%; right: 15%; font-size: 72px; color: rgba(212, 160, 23, 0.13); transform: rotate(-6deg); }
+    .money-bg .s7 { top: 30%; left: 45%; font-size: 44px;  color: rgba(212, 160, 23, 0.11); }
+    .money-bg .s8 { top: 68%; left: 55%; font-size: 58px;  color: rgba(13, 148, 136, 0.11); transform: rotate(20deg); }
+    .money-bg .s9 { top: 12%; left: 38%; font-size: 36px;  color: rgba(212, 160, 23, 0.12); transform: rotate(-20deg); }
+    .money-bg .s10 { top: 48%; right: 22%; font-size: 42px; color: rgba(13, 148, 136, 0.12); transform: rotate(12deg); }
+    .money-bg .s11 { top: 78%; left: 40%; font-size: 50px; color: rgba(212, 160, 23, 0.12); transform: rotate(5deg); }
+    .money-bg .s12 { top: 25%; right: 28%; font-size: 38px; color: rgba(212, 160, 23, 0.10); }
+
+    .header, .tabs, .container, .footer-note, #toast {
+      position: relative;
+      z-index: 1;
     }
 
     /* ========== Header ========== */
@@ -63,23 +99,25 @@
       content: "¥";
       position: absolute;
       top: -10px;
-      right: 12px;
-      font-size: 120px;
+      right: 8px;
+      font-size: 110px;
       font-weight: 700;
-      color: rgba(212, 160, 23, 0.06);
+      color: rgba(212, 160, 23, 0.16);
       pointer-events: none;
       line-height: 1;
     }
 
     .header::after {
-      content: "";
+      content: "$";
       position: absolute;
-      bottom: -40%;
-      left: -15%;
-      width: 180px;
-      height: 180px;
-      background: radial-gradient(circle, rgba(13, 148, 136, 0.08) 0%, transparent 70%);
+      bottom: -8px;
+      left: 10px;
+      font-size: 64px;
+      font-weight: 700;
+      color: rgba(13, 148, 136, 0.13);
       pointer-events: none;
+      line-height: 1;
+      transform: rotate(-18deg);
     }
 
     .header-content {
@@ -841,6 +879,20 @@
   </style>
 </head>
 <body>
+  <div class="money-bg" aria-hidden="true">
+    <span class="s1">$</span>
+    <span class="s2">¥</span>
+    <span class="s3">$</span>
+    <span class="s4">¥</span>
+    <span class="s5">¢</span>
+    <span class="s6">$</span>
+    <span class="s7">¥</span>
+    <span class="s8">$</span>
+    <span class="s9">$</span>
+    <span class="s10">¥</span>
+    <span class="s11">$</span>
+    <span class="s12">¢</span>
+  </div>
   <div class="header">
     <div class="header-content">
       <div class="header-top-row">
