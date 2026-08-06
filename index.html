@@ -694,8 +694,8 @@
           <input type="number" id="birthYear" placeholder="例如：1990" min="1950" max="2010">
         </div>
         <div class="form-group">
-          <label>目前 0050 股價（手動更新）</label>
-          <input type="number" id="currentPrice" placeholder="例如：180.5" step="0.01" min="0">
+          <label>目前 0050 股價（自動更新，也可手動修改）</label>
+          <input type="number" id="currentPrice" placeholder="載入中..." step="0.01" min="0">
         </div>
         <button class="btn btn-primary" onclick="saveProfile()">儲存個人資料</button>
       </div>
@@ -865,7 +865,29 @@
       renderAll();
       setupTabs();
       document.getElementById('buyDate').valueAsDate = new Date();
+      loadCurrentPrice(); // 自動抓取最新 0050 股價
     });
+
+    // ========== 自動抓取 0050 最新股價 ==========
+    function loadCurrentPrice() {
+      fetch(GOOGLE_SCRIPT_URL + '?action=getPrice')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.price) {
+            const price = parseFloat(data.price);
+            if (!isNaN(price) && price > 0) {
+              profile.currentPrice = price;
+              document.getElementById('currentPrice').value = price;
+              saveData();
+              renderStats(); // 重新計算市值
+              showToast('已自動更新 0050 股價：' + price);
+            }
+          }
+        })
+        .catch(err => {
+          console.log('無法自動取得股價', err);
+        });
+    }
 
     function setupTabs() {
       document.querySelectorAll('.tab').forEach(tab => {
