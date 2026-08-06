@@ -1170,6 +1170,7 @@
         if (buyDateEl) buyDateEl.valueAsDate = new Date();
         renderAll();
         loadCurrentPrice();
+        loadDividendInfo();
       } catch (e) {
         console.log('初始化錯誤', e);
         // 即使出錯也要確保頁籤能點
@@ -1212,7 +1213,7 @@
               section.classList.add('active');
             }
             if (tab.dataset.tab === 'dividend') {
-              updateDividendInfo();
+              loadDividendInfo();
             }
             if (tab.dataset.tab === 'calc') {
               loadGroupMonthlyStatus();
@@ -1225,7 +1226,6 @@
     }
 
     // ========== 配息資訊 ==========
-    // 預設參考值（之後可改成從 Google 試算表讀取）
     let dividendInfo = {
       lastAmount: 0.60,
       method: '半年配',
@@ -1234,6 +1234,28 @@
       payDate: '2026/8/10'
     };
 
+    function loadDividendInfo() {
+      fetch(GOOGLE_SCRIPT_URL + '?action=getDividend')
+        .then(res => res.json())
+        .then(data => {
+          if (!data) return;
+          if (data.lastAmount !== undefined && data.lastAmount !== '') {
+            dividendInfo.lastAmount = Number(data.lastAmount) || 0;
+          }
+          if (data.method) dividendInfo.method = data.method;
+          if (data.annual !== undefined && data.annual !== '') {
+            dividendInfo.annual = Number(data.annual) || 0;
+          }
+          if (data.exDate) dividendInfo.exDate = data.exDate;
+          if (data.payDate) dividendInfo.payDate = data.payDate;
+          updateDividendInfo();
+        })
+        .catch(err => {
+          console.log('無法取得配息資訊', err);
+          updateDividendInfo();
+        });
+    }
+
     function updateDividendInfo() {
       try {
         const setText = (id, text) => {
@@ -1241,15 +1263,15 @@
           if (el) el.textContent = text;
         };
 
-        setText('divLastAmount', '$' + dividendInfo.lastAmount.toFixed(2));
-        setText('divMethod', dividendInfo.method);
-        setText('divAnnual', '$' + dividendInfo.annual.toFixed(2));
-        setText('divExDate', dividendInfo.exDate);
-        setText('divPayDate', dividendInfo.payDate);
+        setText('divLastAmount', '$' + Number(dividendInfo.lastAmount).toFixed(2));
+        setText('divMethod', dividendInfo.method || '—');
+        setText('divAnnual', '$' + Number(dividendInfo.annual).toFixed(2));
+        setText('divExDate', dividendInfo.exDate || '—');
+        setText('divPayDate', dividendInfo.payDate || '—');
 
         // 預估殖利率 = 年化股利 / 目前股價
         const price = profile.currentPrice || 0;
-        if (price > 0) {
+        if (price > 0 && dividendInfo.annual > 0) {
           const yieldPct = (dividendInfo.annual / price * 100).toFixed(2);
           setText('divYield', yieldPct + '%');
         } else {
@@ -1261,7 +1283,7 @@
         const personal = t.totalShares * dividendInfo.lastAmount;
         setText('divPersonalAmount', '$' + personal.toLocaleString(undefined, {maximumFractionDigits: 0}));
         setText('divPersonalDetail',
-          '持股 ' + t.totalShares.toLocaleString() + ' 股 × $' + dividendInfo.lastAmount.toFixed(2) + ' = $' + personal.toLocaleString(undefined, {maximumFractionDigits: 0})
+          '持股 ' + t.totalShares.toLocaleString() + ' 股 × $' + Number(dividendInfo.lastAmount).toFixed(2) + ' = $' + personal.toLocaleString(undefined, {maximumFractionDigits: 0})
         );
       } catch (e) {
         console.log('updateDividendInfo error', e);
