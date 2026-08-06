@@ -1231,7 +1231,8 @@
       method: '半年配',
       annual: 1.60,
       exDate: '2026/7/21',
-      payDate: '2026/8/10'
+      payDate: '2026/8/10',
+      yieldRate: null
     };
 
     function loadDividendInfo() {
@@ -1248,6 +1249,9 @@
           }
           if (data.exDate) dividendInfo.exDate = data.exDate;
           if (data.payDate) dividendInfo.payDate = data.payDate;
+          if (data.yieldRate !== undefined && data.yieldRate !== null && data.yieldRate !== '') {
+            dividendInfo.yieldRate = data.yieldRate;
+          }
           updateDividendInfo();
         })
         .catch(err => {
@@ -1269,13 +1273,28 @@
         setText('divExDate', dividendInfo.exDate || '—');
         setText('divPayDate', dividendInfo.payDate || '—');
 
-        // 預估殖利率 = 年化股利 / 目前股價
-        const price = profile.currentPrice || 0;
-        if (price > 0 && dividendInfo.annual > 0) {
-          const yieldPct = (dividendInfo.annual / price * 100).toFixed(2);
-          setText('divYield', yieldPct + '%');
+        // 預估殖利率：優先使用試算表 O31
+        if (dividendInfo.yieldRate !== null && dividendInfo.yieldRate !== undefined && dividendInfo.yieldRate !== '') {
+          var num = Number(dividendInfo.yieldRate);
+          if (!isNaN(num)) {
+            // 若為 0.0155 這種小數，轉成百分比；若已是 1.55 則直接顯示
+            if (num > 0 && num < 1) {
+              setText('divYield', (num * 100).toFixed(2) + '%');
+            } else {
+              setText('divYield', num.toFixed(2) + '%');
+            }
+          } else {
+            setText('divYield', String(dividendInfo.yieldRate));
+          }
         } else {
-          setText('divYield', '—');
+          // 後備：用年化股利 / 股價計算
+          const price = profile.currentPrice || 0;
+          if (price > 0 && dividendInfo.annual > 0) {
+            const yieldPct = (dividendInfo.annual / price * 100).toFixed(2);
+            setText('divYield', yieldPct + '%');
+          } else {
+            setText('divYield', '—');
+          }
         }
 
         // 個人預估可領
