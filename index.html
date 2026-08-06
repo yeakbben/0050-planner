@@ -10,22 +10,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --navy: #1a2b3c;
-      --navy-light: #2c3e50;
-      --gold: #d4a017;
+      --navy: #0f1c2e;
+      --navy-light: #1e3348;
+      --gold: #c4920a;
       --gold-soft: #fbf6e9;
       --gold-light: #f0d78c;
-      --emerald: #0d9488;
-      --emerald-soft: #e6f7f5;
-      --rose: #e11d48;
-      --bg: #f7f8fa;
+      --emerald: #0b7f76;
+      --emerald-soft: #e0f5f2;
+      --rose: #c9183a;
+      --bg: #f0f2f5;
       --card: #ffffff;
-      --text: #1a2b3c;
-      --text-secondary: #6b7c8a;
-      --border: #e8ecf0;
+      --text: #0f1c2e;
+      --text-secondary: #5a6b7a;
+      --border: #dde3ea;
       --radius: 18px;
-      --shadow: 0 2px 12px rgba(26, 43, 60, 0.05);
-      --shadow-hover: 0 6px 24px rgba(26, 43, 60, 0.08);
+      --shadow: 0 2px 14px rgba(15, 28, 46, 0.07);
+      --shadow-hover: 0 6px 24px rgba(15, 28, 46, 0.1);
     }
 
     * {
@@ -60,23 +60,23 @@
     .money-bg span {
       position: absolute;
       font-weight: 700;
-      color: rgba(212, 160, 23, 0.14);
+      color: rgba(196, 146, 10, 0.09);
       line-height: 1;
       user-select: none;
     }
 
-    .money-bg .s1 { top: 8%;  left: 6%;  font-size: 80px;  color: rgba(212, 160, 23, 0.16); }
-    .money-bg .s2 { top: 18%; right: 8%; font-size: 54px;  color: rgba(13, 148, 136, 0.14); transform: rotate(15deg); }
-    .money-bg .s3 { top: 42%; left: 4%;  font-size: 64px;  color: rgba(212, 160, 23, 0.13); transform: rotate(-12deg); }
-    .money-bg .s4 { top: 55%; right: 5%; font-size: 100px; color: rgba(212, 160, 23, 0.15); }
-    .money-bg .s5 { top: 72%; left: 12%; font-size: 48px;  color: rgba(13, 148, 136, 0.12); transform: rotate(8deg); }
-    .money-bg .s6 { top: 85%; right: 15%; font-size: 72px; color: rgba(212, 160, 23, 0.13); transform: rotate(-6deg); }
-    .money-bg .s7 { top: 30%; left: 45%; font-size: 44px;  color: rgba(212, 160, 23, 0.11); }
-    .money-bg .s8 { top: 68%; left: 55%; font-size: 58px;  color: rgba(13, 148, 136, 0.11); transform: rotate(20deg); }
-    .money-bg .s9 { top: 12%; left: 38%; font-size: 36px;  color: rgba(212, 160, 23, 0.12); transform: rotate(-20deg); }
-    .money-bg .s10 { top: 48%; right: 22%; font-size: 42px; color: rgba(13, 148, 136, 0.12); transform: rotate(12deg); }
-    .money-bg .s11 { top: 78%; left: 40%; font-size: 50px; color: rgba(212, 160, 23, 0.12); transform: rotate(5deg); }
-    .money-bg .s12 { top: 25%; right: 28%; font-size: 38px; color: rgba(212, 160, 23, 0.10); }
+    .money-bg .s1 { top: 8%;  left: 6%;  font-size: 80px;  color: rgba(196, 146, 10, 0.10); }
+    .money-bg .s2 { top: 18%; right: 8%; font-size: 54px;  color: rgba(11, 127, 118, 0.09); transform: rotate(15deg); }
+    .money-bg .s3 { top: 42%; left: 4%;  font-size: 64px;  color: rgba(196, 146, 10, 0.08); transform: rotate(-12deg); }
+    .money-bg .s4 { top: 55%; right: 5%; font-size: 100px; color: rgba(196, 146, 10, 0.09); }
+    .money-bg .s5 { top: 72%; left: 12%; font-size: 48px;  color: rgba(11, 127, 118, 0.08); transform: rotate(8deg); }
+    .money-bg .s6 { top: 85%; right: 15%; font-size: 72px; color: rgba(196, 146, 10, 0.08); transform: rotate(-6deg); }
+    .money-bg .s7 { top: 30%; left: 45%; font-size: 44px;  color: rgba(196, 146, 10, 0.07); }
+    .money-bg .s8 { top: 68%; left: 55%; font-size: 58px;  color: rgba(11, 127, 118, 0.07); transform: rotate(20deg); }
+    .money-bg .s9 { top: 12%; left: 38%; font-size: 36px;  color: rgba(196, 146, 10, 0.07); transform: rotate(-20deg); }
+    .money-bg .s10 { top: 48%; right: 22%; font-size: 42px; color: rgba(11, 127, 118, 0.07); transform: rotate(12deg); }
+    .money-bg .s11 { top: 78%; left: 40%; font-size: 50px; color: rgba(196, 146, 10, 0.07); transform: rotate(5deg); }
+    .money-bg .s12 { top: 25%; right: 28%; font-size: 38px; color: rgba(196, 146, 10, 0.06); }
 
     .header, .tabs, .container, .footer-note, #toast {
       position: relative;
@@ -102,7 +102,7 @@
       right: 8px;
       font-size: 110px;
       font-weight: 700;
-      color: rgba(212, 160, 23, 0.16);
+      color: rgba(196, 146, 10, 0.10);
       pointer-events: none;
       line-height: 1;
     }
@@ -114,7 +114,7 @@
       left: 10px;
       font-size: 64px;
       font-weight: 700;
-      color: rgba(13, 148, 136, 0.13);
+      color: rgba(11, 127, 118, 0.08);
       pointer-events: none;
       line-height: 1;
       transform: rotate(-18deg);
@@ -215,7 +215,7 @@
       box-shadow: var(--shadow);
       padding: 20px;
       margin-bottom: 18px;
-      border: 1px solid rgba(226, 232, 240, 0.8);
+      border: 1px solid var(--border);
       transition: box-shadow 0.3s ease;
     }
 
@@ -362,31 +362,31 @@
     }
 
     .summary-value {
-      font-size: 2rem;
-      font-weight: 700;
+      font-size: 2.1rem;
+      font-weight: 800;
       letter-spacing: -0.03em;
       margin-bottom: 4px;
-      color: var(--navy);
+      color: #0a1628;
     }
 
     .summary-profit {
       font-size: 0.88rem;
-      font-weight: 600;
+      font-weight: 700;
       display: inline-block;
-      padding: 3px 10px;
+      padding: 4px 11px;
       border-radius: 20px;
-      background: #f1f5f9;
+      background: #eef2f6;
       color: var(--text-secondary);
       flex-shrink: 0;
     }
 
     .summary-profit.positive {
-      color: #0d9488;
-      background: var(--emerald-soft);
+      color: #087f76;
+      background: #d8f3ef;
     }
 
     .summary-profit.negative {
-      color: #e11d48;
+      color: #b91c3c;
       background: #fff1f2;
     }
 
@@ -404,9 +404,9 @@
     }
 
     .dash-progress-pct {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--emerald);
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #087f76;
       letter-spacing: -0.02em;
       text-align: center;
     }
@@ -437,31 +437,31 @@
 
     .month-badge {
       font-size: 0.75rem;
-      padding: 3px 10px;
+      padding: 4px 11px;
       border-radius: 20px;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .month-badge.done {
-      background: #d1fae5;
-      color: #047857;
+      background: #c6f0e4;
+      color: #066a5e;
     }
 
     .month-badge.pending {
-      background: #fee2e2;
-      color: #b91c1c;
+      background: #ffe0e4;
+      color: #a1122f;
     }
 
     .month-progress-bar {
-      height: 10px;
-      background: #e2e8f0;
+      height: 11px;
+      background: #d8dee6;
       border-radius: 6px;
       overflow: hidden;
     }
 
     .month-progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, #059669, #34d399);
+      background: linear-gradient(90deg, #0b7f76, #14b8a6);
       border-radius: 6px;
       transition: width 0.5s ease;
     }
