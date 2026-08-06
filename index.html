@@ -346,21 +346,28 @@
       font-weight: 500;
     }
 
+    .summary-value-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      gap: 12px;
+    }
+
     .summary-value {
       font-size: 2.1rem;
       font-weight: 700;
       letter-spacing: -0.03em;
-      margin-bottom: 6px;
     }
 
     .summary-profit {
       font-size: 0.95rem;
       font-weight: 600;
-      margin-bottom: 18px;
       display: inline-block;
       padding: 4px 12px;
       border-radius: 20px;
       background: rgba(255,255,255,0.1);
+      flex-shrink: 0;
     }
 
     .summary-profit.positive {
@@ -767,8 +774,10 @@
       <!-- 最上方總覽卡片 -->
       <div class="summary-card" id="summaryCard">
         <div class="summary-label">0050 總資產估值</div>
-        <div class="summary-value" id="summaryMarketValue">$0</div>
-        <div class="summary-profit" id="summaryProfit">—</div>
+        <div class="summary-value-row">
+          <div class="summary-value" id="summaryMarketValue">$0</div>
+          <div class="summary-profit" id="summaryProfit">—</div>
+        </div>
         <div class="summary-stats">
           <div class="summary-stat">
             <div class="s-label">投入本金</div>
