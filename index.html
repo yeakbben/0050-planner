@@ -892,10 +892,40 @@
           tab.classList.add('active');
           document.getElementById(tab.dataset.tab).classList.add('active');
           if (tab.dataset.tab === 'rank') {
-            updateChart();
+            loadSharedRanking();
           }
         });
       });
+    }
+
+    // ========== 從 Google 試算表讀取共用排行榜 ==========
+    function loadSharedRanking() {
+      const list = document.getElementById('leaderList');
+      list.innerHTML = '<div class="empty-state">正在載入共用排行榜...</div>';
+
+      fetch(GOOGLE_SCRIPT_URL + '?action=getRanking')
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            leaders = data.map(item => ({
+              name: item.name,
+              value: Number(item.value) || 0
+            }));
+            leaders.sort((a, b) => b.value - a.value);
+            saveData();
+            updateChart();
+            renderLeaderList();
+          } else {
+            list.innerHTML = '<div class="empty-state"><span class="emoji">🏆</span>目前還沒有排行資料<br>快來成為第一位更新成績的人！</div>';
+            if (rankChart) updateChart();
+          }
+        })
+        .catch(err => {
+          console.log('載入排行榜失敗', err);
+          renderLeaderList();
+          updateChart();
+          showToast('無法載入雲端排行，顯示本地資料');
+        });
     }
 
     // ========== LocalStorage ==========
@@ -1159,6 +1189,11 @@
       });
 
       showToast('排行榜已更新並同步至雲端');
+
+      // 稍後重新從雲端載入最新排行
+      setTimeout(() => {
+        loadSharedRanking();
+      }, 1500);
     }
 
     function syncMyValue() {
