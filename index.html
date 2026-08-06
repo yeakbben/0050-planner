@@ -1171,6 +1171,10 @@
         renderAll();
         loadCurrentPrice();
         loadDividendInfo();
+        // 若本機已有暱稱，自動從雲端同步買進紀錄
+        if (profile.nickname && profile.nickname !== '匿名') {
+          loadMyPurchases(profile.nickname);
+        }
       } catch (e) {
         console.log('初始化錯誤', e);
         // 即使出錯也要確保頁籤能點
@@ -1353,8 +1357,45 @@
         annualReturn: annualReturn
       });
 
-      showToast('個人資料已儲存並同步至雲端');
+      // 從雲端載入此暱稱的買進紀錄（跨裝置同步）
+      loadMyPurchases(profile.nickname);
+
+      showToast('個人資料已儲存，正在載入雲端紀錄...');
       updateDividendInfo();
+    }
+
+    // 依暱稱從 Google 試算表載入買進紀錄
+    function loadMyPurchases(nickname) {
+      if (!nickname || nickname === '匿名') return;
+
+      fetch(GOOGLE_SCRIPT_URL + '?action=getMyPurchases&nickname=' + encodeURIComponent(nickname))
+        .then(res => res.json())
+        .then(data => {
+          if (!data || !Array.isArray(data.purchases)) {
+            showToast('雲端尚無此暱稱的買進紀錄');
+            return;
+          }
+
+          // 用雲端資料覆蓋本機持倉
+          purchases = data.purchases.map(function(p, idx) {
+            return {
+              id: Date.now() + idx,
+              date: p.date,
+              shares: Number(p.shares) || 0,
+              price: Number(p.price) || 0,
+              cost: Number(p.cost) || Math.round((Number(p.shares) || 0) * (Number(p.price) || 0))
+            };
+          });
+
+          saveData();
+          renderAll();
+          updateDividendInfo();
+          showToast('已載入「' + nickname + '」的雲端紀錄（' + purchases.length + ' 筆）');
+        })
+        .catch(err => {
+          console.log('載入雲端買進紀錄失敗', err);
+          showToast('無法載入雲端紀錄，請稍後再試');
+        });
     }
 
     // ========== 買進紀錄 ==========
