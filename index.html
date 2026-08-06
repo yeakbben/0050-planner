@@ -414,6 +414,78 @@
       justify-content: flex-start;
     }
 
+    /* ========== 退休進度 ========== */
+    .progress-goal-box {
+      background: linear-gradient(145deg, #f0fdf4, #ecfdf5);
+      border: 1px solid rgba(5, 150, 105, 0.2);
+      border-radius: 14px;
+      padding: 16px;
+      margin: 16px 0;
+      text-align: center;
+    }
+
+    .progress-goal-title {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .progress-goal-pct {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #059669;
+      letter-spacing: -0.02em;
+    }
+
+    .progress-goal-detail {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-top: 8px;
+    }
+
+    /* ========== 全員本月狀態 ========== */
+    .member-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: #f8fafc;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .member-row .member-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--navy);
+    }
+
+    .member-row .member-meta {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .member-badge {
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+
+    .member-badge.yes {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .member-badge.no {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
     /* ========== Dividend page ========== */
     .dividend-grid {
       display: grid;
@@ -852,16 +924,12 @@
       <div class="card">
         <div class="card-title"><span class="icon">👤</span> 我的基本資料</div>
         <div class="form-group">
-          <label>暱稱（顯示在排行榜）</label>
+          <label>暱稱</label>
           <input type="text" id="nickname" placeholder="例如：小明" maxlength="12">
         </div>
         <div class="form-group">
           <label>出生年份</label>
           <input type="number" id="birthYear" placeholder="例如：1990" min="1950" max="2010">
-        </div>
-        <div class="form-group">
-          <label>目前 0050 股價（自動更新，也可手動修改）</label>
-          <input type="number" id="currentPrice" placeholder="載入中..." step="0.01" min="0">
         </div>
         <button class="btn btn-primary" onclick="saveProfile()">儲存個人資料</button>
       </div>
@@ -958,6 +1026,16 @@
 
         <div id="resultContent"></div>
 
+        <!-- 退休進度 -->
+        <div class="progress-goal-box" id="progressGoalBox" style="display:none;">
+          <div class="progress-goal-title">目前總資產達成進度</div>
+          <div class="progress-goal-pct" id="progressGoalPct">0%</div>
+          <div class="month-progress-bar" style="margin:12px 0;">
+            <div class="month-progress-fill" id="progressGoalFill" style="width:0%"></div>
+          </div>
+          <div class="progress-goal-detail" id="progressGoalDetail"></div>
+        </div>
+
         <div class="assumptions">
           <strong>計算假設說明</strong><br>
           • 目標本金以「4% 法則」估算（每月生活費 × 12 ÷ 0.04）<br>
@@ -965,6 +1043,21 @@
           • 每月定期定額投入，採複利計算<br>
           • 報酬率為假設值，實際市場會波動，僅供規劃參考
         </div>
+      </div>
+
+      <!-- 本月全員買進狀況 -->
+      <div class="card">
+        <div class="card-title">
+          <span class="icon">👥</span> 本月全員買進狀況
+          <span id="groupMonthLabel" style="font-size:0.8rem; font-weight:500; color:var(--text-secondary); margin-left:8px;"></span>
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:14px; line-height:1.5;">
+          顯示每位朋友本月是否有買進 0050，互相督促一起存股。
+        </p>
+        <div id="groupMonthlyList">
+          <div class="empty-state">載入中...</div>
+        </div>
+        <button class="btn btn-outline" style="margin-top:12px;" onclick="loadGroupMonthlyStatus()">重新整理</button>
       </div>
     </div>
 
@@ -1093,8 +1186,8 @@
             const price = parseFloat(data.price);
             if (!isNaN(price) && price > 0) {
               profile.currentPrice = price;
-              document.getElementById('currentPrice').value = price;
-              document.getElementById('summaryPrice').textContent = '0050 即時價：$' + price;
+              const sp = document.getElementById('summaryPrice');
+              if (sp) sp.textContent = '0050 即時價：$' + price;
               saveData();
               renderStats(); // 重新計算市值
               showToast('已自動更新 0050 股價：' + price);
@@ -1120,6 +1213,9 @@
             }
             if (tab.dataset.tab === 'dividend') {
               updateDividendInfo();
+            }
+            if (tab.dataset.tab === 'calc') {
+              loadGroupMonthlyStatus();
             }
           } catch (e) {
             console.log('切換頁籤錯誤', e);
@@ -1190,11 +1286,9 @@
 
       const nick = document.getElementById('nickname');
       const by = document.getElementById('birthYear');
-      const cp = document.getElementById('currentPrice');
       const mt = document.getElementById('monthlyTarget');
       if (nick) nick.value = profile.nickname || '';
       if (by) by.value = profile.birthYear || '';
-      if (cp) cp.value = profile.currentPrice || 180;
       if (mt) mt.value = profile.monthlyTarget || 10000;
     }
 
@@ -1202,7 +1296,7 @@
     function saveProfile() {
       profile.nickname = document.getElementById('nickname').value.trim() || '匿名';
       profile.birthYear = parseInt(document.getElementById('birthYear').value) || null;
-      profile.currentPrice = parseFloat(document.getElementById('currentPrice').value) || 180;
+      // 股價由系統自動從 Google 試算表更新，不需手動輸入
       saveData();
       renderStats();
 
@@ -1420,6 +1514,77 @@
 
       document.getElementById('resultContent').innerHTML = html;
       document.getElementById('calcResultCard').style.display = 'block';
+
+      // 顯示目前總資產達成進度
+      const progressPct = neededCapital > 0 ? Math.min(100, (currentMV / neededCapital) * 100) : 0;
+      const pgBox = document.getElementById('progressGoalBox');
+      const pgPct = document.getElementById('progressGoalPct');
+      const pgFill = document.getElementById('progressGoalFill');
+      const pgDetail = document.getElementById('progressGoalDetail');
+      if (pgBox) pgBox.style.display = 'block';
+      if (pgPct) pgPct.textContent = progressPct.toFixed(1) + '%';
+      if (pgFill) pgFill.style.width = progressPct + '%';
+      if (pgDetail) {
+        pgDetail.innerHTML =
+          '目前總資產 $' + Math.round(currentMV).toLocaleString() +
+          ' ／ 目標本金 $' + Math.round(neededCapital).toLocaleString() + '<br>' +
+          (progressPct >= 100
+            ? '🎉 目前資產已達到或超過目標本金！'
+            : '還差 $' + Math.round(neededCapital - currentMV).toLocaleString() + ' 即可達成目標本金');
+      }
+    }
+
+    // ========== 本月全員買進狀況 ==========
+    function loadGroupMonthlyStatus() {
+      const list = document.getElementById('groupMonthlyList');
+      if (list) list.innerHTML = '<div class="empty-state">載入中...</div>';
+
+      fetch(GOOGLE_SCRIPT_URL + '?action=getMonthlyBuyers')
+        .then(res => res.json())
+        .then(data => {
+          if (!data || !data.members) {
+            if (list) list.innerHTML = '<div class="empty-state">目前尚無資料</div>';
+            return;
+          }
+
+          const label = document.getElementById('groupMonthLabel');
+          if (label && data.yearMonth) {
+            label.textContent = '(' + data.yearMonth.replace('-', '/') + ')';
+          }
+
+          if (data.members.length === 0) {
+            if (list) list.innerHTML = '<div class="empty-state">尚無成員買進紀錄<br>有人新增買進後就會出現在這裡</div>';
+            return;
+          }
+
+          let html = '';
+          data.members.forEach(m => {
+            if (m.bought) {
+              html += `
+                <div class="member-row">
+                  <div>
+                    <div class="member-name">${m.name}</div>
+                    <div class="member-meta">本月投入 $${Math.round(m.cost).toLocaleString()}（${m.count} 筆）</div>
+                  </div>
+                  <span class="member-badge yes">✅ 已買進</span>
+                </div>`;
+            } else {
+              html += `
+                <div class="member-row">
+                  <div>
+                    <div class="member-name">${m.name}</div>
+                    <div class="member-meta">本月尚未買進</div>
+                  </div>
+                  <span class="member-badge no">❌ 未買進</span>
+                </div>`;
+            }
+          });
+          if (list) list.innerHTML = html;
+        })
+        .catch(err => {
+          console.log('載入本月買進狀況失敗', err);
+          if (list) list.innerHTML = '<div class="empty-state">無法載入雲端資料<br>請確認 Apps Script 已重新部署</div>';
+        });
     }
 
     // ========== 工具 ==========
