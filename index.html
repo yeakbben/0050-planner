@@ -960,54 +960,21 @@
     <!-- ========== 個人紀錄 ========== -->
     <div id="record" class="section active">
 
-      <!-- 儀表板：退休進度 -->
-      <div class="card dash-card">
-        <div class="card-title"><span class="icon">🎯</span> 退休目標進度</div>
-        <div class="dash-progress-pct" id="dashRetirePct">—</div>
-        <div class="month-progress-bar" style="margin:10px 0 12px;">
-          <div class="month-progress-fill" id="dashRetireFill" style="width:0%"></div>
-        </div>
-        <div class="dash-progress-detail" id="dashRetireDetail">請先在「退休試算」設定每月生活費目標</div>
-      </div>
-
-      <!-- 儀表板：本月入金 -->
-      <div class="card dash-card">
-        <div class="card-title">
-          <span class="icon">📅</span> 本月入金狀況
-          <span id="monthLabel" style="font-size:0.8rem; font-weight:500; color:var(--text-secondary); margin-left:auto;"></span>
-        </div>
-        <div class="month-progress-box">
-          <div class="month-progress-header">
-            <span id="monthPaidText">本月已投入 $0</span>
-            <span id="monthStatusBadge" class="month-badge pending">未達標</span>
-          </div>
-          <div class="month-progress-bar">
-            <div class="month-progress-fill" id="monthProgressFill" style="width:0%"></div>
-          </div>
-          <div class="month-progress-footer">
-            <span id="monthTargetText">目標 $10,000</span>
-            <span id="monthPercentText">0%</span>
-          </div>
-        </div>
-        <div class="form-group" style="margin-top:12px; margin-bottom:8px;">
-          <label>每月目標入金（元）</label>
-          <input type="number" id="monthlyTarget" placeholder="例如：10000" min="0" step="1000" value="10000">
-        </div>
-        <button class="btn btn-outline" onclick="saveMonthlyTarget()">儲存目標金額</button>
-        <button class="btn btn-success" style="margin-top:8px;" id="ctaAddPurchase" onclick="document.getElementById('addPurchaseCard').scrollIntoView({behavior:'smooth'})">＋ 去新增本月買進</button>
-      </div>
-
-      <!-- 資產成長圖 -->
+      <!-- 1. 我的基本資料 -->
       <div class="card">
-        <div class="card-title"><span class="icon">📊</span> 資產成長與本金對比</div>
-        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
-          依買進紀錄累計。灰色＝累計本金，青綠色＝以目前股價估算的市值。
-        </p>
-        <div class="chart-container" style="height:260px;">
-          <canvas id="growthChart"></canvas>
+        <div class="card-title"><span class="icon">👤</span> 我的基本資料</div>
+        <div class="form-group">
+          <label>暱稱</label>
+          <input type="text" id="nickname" placeholder="例如：小明" maxlength="12">
         </div>
+        <div class="form-group">
+          <label>出生年份</label>
+          <input type="number" id="birthYear" placeholder="例如：1990" min="1950" max="2010">
+        </div>
+        <button class="btn btn-primary" onclick="saveProfile()">儲存個人資料</button>
       </div>
 
+      <!-- 2. 新增買進紀錄 -->
       <div class="card" id="addPurchaseCard">
         <div class="card-title"><span class="icon">📝</span> 新增買進紀錄</div>
         <div class="form-row">
@@ -1043,6 +1010,7 @@
         <button class="btn btn-success" onclick="addPurchase()">＋ 加入持倉</button>
       </div>
 
+      <!-- 3. 買進明細 -->
       <div class="card">
         <div class="card-title"><span class="icon">📋</span> 買進明細</div>
         <div id="holdingsList">
@@ -1053,17 +1021,52 @@
         </div>
       </div>
 
+      <!-- 4. 本月入金狀況 -->
+      <div class="card dash-card">
+        <div class="card-title">
+          <span class="icon">📅</span> 本月入金狀況
+          <span id="monthLabel" style="font-size:0.8rem; font-weight:500; color:var(--text-secondary); margin-left:auto;"></span>
+        </div>
+        <div class="month-progress-box">
+          <div class="month-progress-header">
+            <span id="monthPaidText">本月已投入 $0</span>
+            <span id="monthStatusBadge" class="month-badge pending">未達標</span>
+          </div>
+          <div class="month-progress-bar">
+            <div class="month-progress-fill" id="monthProgressFill" style="width:0%"></div>
+          </div>
+          <div class="month-progress-footer">
+            <span id="monthTargetText">目標 $10,000</span>
+            <span id="monthPercentText">0%</span>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:12px; margin-bottom:8px;">
+          <label>每月目標入金（元）</label>
+          <input type="number" id="monthlyTarget" placeholder="例如：10000" min="0" step="1000" value="10000">
+        </div>
+        <button class="btn btn-outline" onclick="saveMonthlyTarget()">儲存目標金額</button>
+        <button class="btn btn-success" style="margin-top:8px;" id="ctaAddPurchase" onclick="document.getElementById('addPurchaseCard').scrollIntoView({behavior:'smooth'})">＋ 去新增本月買進</button>
+      </div>
+
+      <!-- 5. 資產成長與本金對比 -->
       <div class="card">
-        <div class="card-title"><span class="icon">👤</span> 我的基本資料</div>
-        <div class="form-group">
-          <label>暱稱</label>
-          <input type="text" id="nickname" placeholder="例如：小明" maxlength="12">
+        <div class="card-title"><span class="icon">📊</span> 資產成長與本金對比</div>
+        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
+          依買進紀錄累計。灰色＝累計本金，青綠色＝以目前股價估算的市值。
+        </p>
+        <div class="chart-container" style="height:260px;">
+          <canvas id="growthChart"></canvas>
         </div>
-        <div class="form-group">
-          <label>出生年份</label>
-          <input type="number" id="birthYear" placeholder="例如：1990" min="1950" max="2010">
+      </div>
+
+      <!-- 6. 退休目標進度 -->
+      <div class="card dash-card">
+        <div class="card-title"><span class="icon">🎯</span> 退休目標進度</div>
+        <div class="dash-progress-pct" id="dashRetirePct">—</div>
+        <div class="month-progress-bar" style="margin:10px 0 12px;">
+          <div class="month-progress-fill" id="dashRetireFill" style="width:0%"></div>
         </div>
-        <button class="btn btn-primary" onclick="saveProfile()">儲存個人資料</button>
+        <div class="dash-progress-detail" id="dashRetireDetail">請先在「退休試算」設定每月生活費目標</div>
       </div>
     </div>
 
