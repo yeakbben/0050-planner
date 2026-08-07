@@ -971,6 +971,13 @@
           <label>出生年份</label>
           <input type="number" id="birthYear" placeholder="例如：1990" min="1950" max="2010">
         </div>
+        <div class="form-group">
+          <label>Email（用於每月存股提醒）</label>
+          <input type="email" id="userEmail" placeholder="例如：name@gmail.com">
+          <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:6px;">
+            填寫後，若該月尚未買進 0050，系統會從 25 日起寄信提醒
+          </div>
+        </div>
         <button class="btn btn-primary" onclick="saveProfile()">儲存個人資料</button>
       </div>
 
@@ -1222,6 +1229,7 @@
     let profile = {
       nickname: '',
       birthYear: null,
+      email: '',
       currentPrice: 180,
       monthlyTarget: 10000,
       targetLifeMonthly: null,
@@ -1408,11 +1416,13 @@
 
       const nick = document.getElementById('nickname');
       const by = document.getElementById('birthYear');
+      const em = document.getElementById('userEmail');
       const mt = document.getElementById('monthlyTarget');
       const fr = document.getElementById('feeRate');
       const fm = document.getElementById('feeMin');
       if (nick) nick.value = profile.nickname || '';
       if (by) by.value = profile.birthYear || '';
+      if (em) em.value = profile.email || '';
       if (mt) mt.value = profile.monthlyTarget || 10000;
       if (fr) fr.value = profile.feeRate != null ? profile.feeRate : 0.1425;
       if (fm) fm.value = profile.feeMin != null ? profile.feeMin : 20;
@@ -1453,17 +1463,19 @@
     function saveProfile() {
       profile.nickname = document.getElementById('nickname').value.trim() || '匿名';
       profile.birthYear = parseInt(document.getElementById('birthYear').value) || null;
+      profile.email = (document.getElementById('userEmail')?.value || '').trim();
       // 股價由系統自動從 Google 試算表更新，不需手動輸入
       saveData();
       renderStats();
 
-      // 傳送到 Google 試算表（個人資料）
+      // 傳送到 Google 試算表（個人資料 + 通知名單）
       const targetMonthly = parseFloat(document.getElementById('targetMonthly')?.value) || '';
       const annualReturn = parseFloat(document.getElementById('annualReturn')?.value) || 10;
       sendToGoogle({
         type: 'profile',
         nickname: profile.nickname,
         birthYear: profile.birthYear,
+        email: profile.email,
         currentPrice: profile.currentPrice,
         targetMonthly: targetMonthly,
         annualReturn: annualReturn
